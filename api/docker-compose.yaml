@@ -1,0 +1,42 @@
+services:
+  app:
+    build:
+        context: .
+        dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    tty: true
+    depends_on:
+      - db
+    working_dir: /var/www/html
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - app-network
+
+  db:
+    image: pgvector/pgvector:pg16
+    platform: linux/arm64
+    environment:
+      - POSTGRES_USER=local
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=laravel
+      - PGDATA=/var/lib/postgresql/data/db-files/
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+      - ./.deploy/postgres/vector_extension.sql:/docker-entrypoint-initdb.d/0-vector_extension.sql
+    ports:
+      - "54321:5432"
+    networks:
+      - app-network
+
+#Docker Networks
+networks:
+  app-network:
+    driver: bridge
+
+#Volumes
+volumes:
+  dbdata:
+    driver: local
