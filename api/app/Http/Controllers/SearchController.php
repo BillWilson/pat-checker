@@ -8,6 +8,7 @@ use OpenAI\Laravel\Facades\OpenAI;
 use Illuminate\Http\Request;
 use Pgvector\Laravel\Vector;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class SearchController extends Controller
 {
@@ -19,12 +20,15 @@ class SearchController extends Controller
     public function __invoke(Request $request): array
     {
         $validated = $request->validate($this->validations);
-        $patent = Patent::query()->where('publication_number', data_get($validated, 'patent_id'))->first();
 
-        $searchPrompt = $this->searchPrompt($patent);
-        $products = $this->retriveReleatedProduct($patent, data_get($validated, 'company_name'), $searchPrompt);
+        return Cache::remember(sprintf('result-%s-%s', data_get($validated, 'patent_id'), data_get($validated, 'company_name')), 3600, function() use ($validated) {
+            $patent = Patent::query()->where('publication_number', data_get($validated, 'patent_id'))->first();
 
-        return $this->getResult($this->userPrompt($searchPrompt, $products));
+            $searchPrompt = $this->searchPrompt($patent);
+            $products = $this->retrieveProduct(data_get($validated, 'company_name'), $searchPrompt);
+
+            return $this->getResult($this->userPrompt($searchPrompt, $products));
+        });
     }
 
     protected function searchPrompt(Patent $patent): string
@@ -41,7 +45,7 @@ class SearchController extends Controller
         Patent Claims: ' . $claims->join(' \n');
     }
 
-    protected function retriveReleatedProduct(Patent $patent, string $companyName, string $searchPrompt): ?Collection
+    protected function retrieveProduct(string $companyName, string $searchPrompt): ?Collection
     {
         $result = OpenAI::embeddings()->create([
             'model' => 'text-embedding-3-small',
@@ -91,6 +95,6 @@ class SearchController extends Controller
             ],
         ]);
 
-        return data_get($response->toArray(), 'choices.0.message.content', []);
+        return json_decode(data_get($response->toArray(), 'choices.0.message.content', []), true);
     }
 }
