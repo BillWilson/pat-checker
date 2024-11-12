@@ -9,24 +9,8 @@ import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
-
-// Types
-type InfringingProduct = {
-  product_name: string
-  infringement_likelihood: string
-  relevant_claims: string[]
-  explanation: string
-  specific_features: string[]
-}
-
-type AnalysisResult = {
-  analysis_id: string
-  patent_id: string
-  company_name: string
-  analysis_date: string
-  top_infringing_products: InfringingProduct[]
-  overall_risk_assessment: string
-}
+import { AnalysisResult } from "@/types/patent"
+import { getLikelihoodColor } from "@/utils/patent"
 
 type SearchParams = {
   patentId: string
@@ -54,19 +38,6 @@ const analyzePatent = async ({ patentId, companyName }: SearchParams): Promise<A
   }
 
   return response.json()
-}
-
-const getLikelihoodColor = (likelihood: string) => {
-  switch (likelihood.toLowerCase()) {
-    case 'high':
-      return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-    case 'moderate':
-      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-    case 'low':
-      return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-    default:
-      return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
-  }
 }
 
 export default function Search() {
