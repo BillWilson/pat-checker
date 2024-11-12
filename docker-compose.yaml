@@ -42,7 +42,7 @@ services:
       - PGDATA=/var/lib/postgresql/data/db-files/
     volumes:
       - dbdata:/var/lib/postgresql/data
-      - ./.deploy/postgres/vector_extension.sql:/docker-entrypoint-initdb.d/0-vector_extension.sql
+      - ./api/.deploy/postgres/vector_extension.sql:/docker-entrypoint-initdb.d/0-vector_extension.sql
     ports:
       - "54321:5432"
     networks:
