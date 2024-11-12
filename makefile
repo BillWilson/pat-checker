@@ -1,11 +1,6 @@
 # Default shell
 SHELL := /bin/bash
 
-# Colors for terminal output
-GREEN = \033[32m
-RESET = \033[0m
-INFO = echo "\033[32m==> \033[0m"
-
 # Docker compose command
 DC := docker compose
 
