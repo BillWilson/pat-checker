@@ -1,4 +1,4 @@
-# Project Name
+# Takehome
 
 This project is a take-home assignment for an interview. It demonstrates how to set up and run the application using Docker Compose and Makefile commands.
 
