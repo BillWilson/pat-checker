@@ -48,17 +48,23 @@ Please check the commnad `make -h` for all the available commands you can use to
 
 ## Step by step guide
 
-1. Initialize the environment files and container images:
+1. Make sure update environment config for API with OpenAI key:
+   ```bash
+    OPENAI_API_KEY="sk-proj-xxxxxxxxxxxxxxxx"
+    OPENAI_ORGANIZATION="org-xxxxxxxxxxxxx"
+   ```
+
+2. Initialize the environment files and container images:
    ```bash
    make init
    ```
 
-2. Verify all services are running:
+3. Verify all services are running:
    ```bash
    make ps
    ```
 
-3. Access the application:
+4. Access the application:
    - Frontend: http://localhost:8080
    - API: http://localhost:8000
 
