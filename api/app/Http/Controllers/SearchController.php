@@ -23,7 +23,7 @@ class SearchController extends Controller
     {
         $validated = $request->validate($this->validations);
 
-        return Cache::remember(sprintf('result-%s-%s', data_get($validated, 'patent_id'), data_get($validated, 'company_name')), 600, function() use ($validated) {
+        return Cache::remember(sprintf('result-%s-%s', data_get($validated, 'patent_id'), data_get($validated, 'company_name')), 10, function() use ($validated) {
             $patentId = data_get($validated, 'patent_id');
             $companyName = data_get($validated, 'company_name');
             $patent = Patent::query()->where('publication_number', $patentId)->first();
