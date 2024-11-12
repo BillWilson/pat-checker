@@ -36,7 +36,7 @@ Please check the commnad `make -h` for all the available commands you can use to
 - Database: `localhost:54321` (for native database client)
 
 
-## Project Structure
+### Project Structure
 
 ```
 .
