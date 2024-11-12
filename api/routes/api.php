@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\SearchController;
+use App\Http\Controllers;
 
-Route::get('/search', SearchController::class);
+Route::get('/search', Controllers\SearchController::class);
+Route::get('/list', Controllers\ReportListController::class);
