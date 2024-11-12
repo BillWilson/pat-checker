@@ -29,7 +29,7 @@ class CreateProduct extends Command
      */
     public function handle(): void
     {
-        $json = file_get_contents(app_path('company_products.json'));
+        $json = file_get_contents(base_path('company_products.json'));
         $companies = collect(json_decode($json, true));
 
         $this->generateInputCollection(collect($companies->first()));

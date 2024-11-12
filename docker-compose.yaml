@@ -10,7 +10,7 @@ services:
       - NEXT_PUBLIC_API_HOST=http://localhost:8000
     restart: unless-stopped
     depends_on:
-      - app
+      - api
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/"]
       interval: 30s
@@ -18,24 +18,15 @@ services:
       retries: 3
       start_period: 5s
 
-  app:
+  api:
     build:
       context: api
       dockerfile: Dockerfile
     restart: unless-stopped
     tty: true
-    environment:
-      - DB_CONNECTION=pgsql
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_DATABASE=laravel
-      - DB_USERNAME=local
-      - DB_PASSWORD=root
-      - APP_KEY=base64:/fIDJnxoB11lwbIdM8Q7LmDZzrgJvbuTs3H3uX/eoTY=
-      - APP_ENV=production
     depends_on:
       - db
-    working_dir: /var/www/html
+    working_dir: /var/www/
     ports:
       - "8000:8000"
     networks:

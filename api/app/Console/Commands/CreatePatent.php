@@ -26,7 +26,7 @@ class CreatePatent extends Command
      */
     public function handle(): void
     {
-        $json = file_get_contents(app_path('patents.json'));
+        $json = file_get_contents(base_path('patents.json'));
         $patents = collect(json_decode($json, true));
 
         $progressBar = $this->output->createProgressBar($patents->count());
