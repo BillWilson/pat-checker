@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Badge } from "@/components/ui/badge"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 // Types
 type InfringingProduct = {
@@ -54,6 +56,19 @@ const analyzePatent = async ({ patentId, companyName }: SearchParams): Promise<A
   return response.json()
 }
 
+const getLikelihoodColor = (likelihood: string) => {
+  switch (likelihood.toLowerCase()) {
+    case 'high':
+      return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+    case 'moderate':
+      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+    case 'low':
+      return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+    default:
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+  }
+}
+
 export default function Search() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -77,7 +92,6 @@ export default function Search() {
     queryKey: ['patentAnalysis', queryParams],
     queryFn: () => analyzePatent(queryParams),
     enabled: Boolean(patentId && companyName), // Only run when both parameters are present
-    staleTime: 5 * 60 * 1000, // Consider data stale after 5 minutes
   })
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -169,42 +183,73 @@ export default function Search() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className='text-2xl font-extrabold dark:text-white'>Analysis Result</CardTitle>
+              <CardTitle>Analysis Result</CardTitle>
               <CardDescription>
                 Analysis ID: {analysisResult.analysis_id} | Date: {analysisResult.analysis_date}
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p><strong>Patent ID:</strong> {analysisResult.patent_id}</p>
-              <p><strong>Company Name:</strong> {analysisResult.company_name}</p>
-              <p className="mt-4"><strong>Overall Risk Assessment:</strong></p>
-              <p>{analysisResult.overall_risk_assessment}</p>
+              <ScrollArea className="h-[600px]">
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Patent ID</p>
+                      <p className="font-mono">{analysisResult.patent_id}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Company</p>
+                      <p>{analysisResult.company_name}</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-2">Risk Assessment</p>
+                    <p className="text-sm">{analysisResult.overall_risk_assessment}</p>
+                  </div>
+
+                  <h3 className="text-lg font-semibold mt-6">Infringing Products Analysis</h3>
+                  {analysisResult.top_infringing_products.map((product, index) => (
+                    <Card key={index} className="mt-4">
+                      <CardHeader className="pb-2">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-base">{product.product_name}</CardTitle>
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getLikelihoodColor(product.infringement_likelihood)}`}>
+                            {product.infringement_likelihood}
+                          </span>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          <div>
+                            <p className="text-sm text-muted-foreground">Relevant Claims</p>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {product.relevant_claims.map(claim => (
+                                <Badge key={claim} variant="outline">{claim}</Badge>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div>
+                            <p className="text-sm text-muted-foreground">Explanation</p>
+                            <p className="text-sm mt-1">{product.explanation}</p>
+                          </div>
+
+                          <div>
+                            <p className="text-sm text-muted-foreground">Specific Features</p>
+                            <ul className="list-disc pl-5 text-sm mt-1">
+                              {product.specific_features.map((feature, featureIndex) => (
+                                <li key={featureIndex}>{feature}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </ScrollArea>
             </CardContent>
           </Card>
-
-          <h3 className='text-xl font-extrabold dark:text-white'>Top Infringing Products</h3>
-
-          {analysisResult.top_infringing_products.map((product, index) => (
-            <Card key={index}>
-              <CardHeader>
-                <CardTitle>{product.product_name}</CardTitle>
-                <CardDescription>
-                  Infringement Likelihood: {product.infringement_likelihood}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p><strong>Relevant Claims:</strong> {product.relevant_claims.join(', ')}</p>
-                <p className="mt-2"><strong>Explanation:</strong></p>
-                <p>{product.explanation}</p>
-                <p className="mt-2"><strong>Specific Features:</strong></p>
-                <ul className="list-disc pl-5">
-                  {product.specific_features.map((feature, featureIndex) => (
-                    <li key={featureIndex}>{feature}</li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          ))}
         </div>
       )}
     </div>
