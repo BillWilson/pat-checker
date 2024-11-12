@@ -28,9 +28,6 @@ RUN pnpm run build
 # Production stage with Nginx
 FROM nginx:alpine AS runner
 
-# Install curl for healthcheck
-RUN apk add --no-cache curl
-
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
 
@@ -55,10 +52,6 @@ RUN chown -R nginx:nginx /usr/share/nginx/html && \
 USER nginx
 
 EXPOSE 8080
-
-# Add healthcheck
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl --fail http://localhost:8080/health.txt || exit 1
 
 # Use nginx's daemon-off option to run it in the foreground
 CMD ["nginx", "-g", "daemon off;"]
