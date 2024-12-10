@@ -56,7 +56,8 @@ Please check the commnad `make -h` for all the available commands you can use to
 
 2. Initialize the environment files and container images:
    ```bash
-   make init
+   make setup
+   make init-db
    ```
 
 3. Verify all services are running:
